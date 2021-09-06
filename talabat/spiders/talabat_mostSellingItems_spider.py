@@ -1,9 +1,9 @@
 import scrapy
-import requests
+#import requests
 import json
 
-class Talabat(scrapy.Spider):
-    name = 'talabat'
+class Talabat_MSI(scrapy.Spider):
+    name = 'talabat_mostSellingItems'
     start_urls = [
             'https://www.talabat.com/apiweb/v1/ksa/mostSellingItem',
             'https://www.talabat.com/apiweb/v1/bahrain/mostSellingItem',
@@ -13,25 +13,19 @@ class Talabat(scrapy.Spider):
             'https://www.talabat.com/apiweb/v1/qatar/mostSellingItem',
             'https://www.talabat.com/apiweb/v1/jordan/mostSellingItem',
             'https://www.talabat.com/apiweb/v1/egypt/mostSellingItem',
-            'https://www.talabat.com/apiweb/v1/iraq/mostSellingItem',
-            'https://www.talabat.com/apiweb/v1/ksa/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/kuwait/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/bahrain/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/uae/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/oman/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/qatar/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/jordan/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/egypt/mostSellingByRest/0',
-            'https://www.talabat.com/apiweb/v1/iraq/mostSellingByRest/0'
+            'https://www.talabat.com/apiweb/v1/iraq/mostSellingItem'
         ]
     def parse(self, response):
-        out_list = []
-        for url in urls:
-            res = requests.get(url[1])
-            out_list.append(res.json)
-        json_file = open('out.json','w')
-        json.dump(json.dumps(out_list),json_file)
-        json_file.close()
+        jres = json.loads(response.text)
+        for item in jres['result']['mostSellingItems']:
+            yield {
+                'id': item['id'],
+                'name': item['na'],
+                'rid': item['rid'],
+                'restaurant': item['rna'],
+                'desc': item['dsc'],
+                'slg': item['slg']
+            }
 
 
 ''' for i in urls:
@@ -41,7 +35,13 @@ class Talabat(scrapy.Spider):
     with open(i[0] + ".json", "w") as outfile:
         outfile.write(data)
 
-
+out_list = []
+for url in urls:
+    res = requests.get(url[1])
+    out_list.append(res.json)
+json_file = open('out.json','w')
+json.dump(json.dumps(out_list),json_file)
+json_file.close()
 
 params = dict(
     origin='Chicago,IL',
