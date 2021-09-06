@@ -18,8 +18,10 @@ class Talabat_MSBR(scrapy.Spider):
 
     def parse(self, response):
         jres = json.loads(response.text)
+        country = response.request.url.split('/')[-3]
         for item in jres['result']['mostSellingItemsRestaurant']:
             yield {
+                'countr': country,
                 'id': item['id'],
                 'name': item['rna'],
                 'cuisine': item['cs']
